@@ -1,9 +1,13 @@
 from flask import Flask, request
 from flask_sockets import Sockets
+from pubsub.pubsubhub import PubSubHub
 
 # Declaring http app and sockets app
 http = Flask(__name__)
 ws = Sockets(http)
+
+
+pubsub = PubSubHub(http, ws)
 
 if __name__ == "__main__":
     from gevent import pywsgi
