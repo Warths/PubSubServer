@@ -48,7 +48,8 @@ if __name__ == "__main__":
 > PubSubHub is a class that provide a closed Websocket/HTTP hub for client to connects, subscribe or publish. It takes the Flask and Flask-sockets Apps as arguments, and creates the ws and http endpoints automatically. 
 > Routes for both endpoints can be customized, to allow multiple PubSubHub to work on the same application.
 
-**Methods**: add_topic(topic)
+**Methods**: 
+add_topic(topic)
 > Allows to add a topic to the PubSub Hub. Topic is a class that is described below, which
 
 ### Class: Client
@@ -56,3 +57,15 @@ if __name__ == "__main__":
 > It wraps the client handling loop as `serve()`
 > It allows for non-blocking receive
 > Checks ping requirements as well as subscription requirements      
+
+**Properties**: 
+is_alive: 
+> Checks if the last ping/pong was issued before the timeout threshold 
+
+
+**Methods**:
+serve():
+> Client Handling loop (described above)
+
+subscriber_since(amount)
+> Checks if the client was subscribed to anything within the `amount` last seconds
