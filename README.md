@@ -52,4 +52,7 @@ if __name__ == "__main__":
 > Allows to add a topic to the PubSub Hub. Topic is a class that is described below, which
 
 ### Class: Client
->  To be completed
+> Client represent the websocket connection from the POV of the Hub, providing methods to serve and check connexion health.  
+> It wraps the client handling loop as `serve()`
+> It allows for non-blocking receive
+> Checks ping requirements as well as subscription requirements      
