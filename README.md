@@ -30,7 +30,7 @@ if __name__ == "__main__":
 3. Creating PubSubHub(s)
 4. Building composite(s) topic(s) using either provided or custom components
 5. Adding topics to PubSubHub(s)
-6. Serve throught the server of your choice
+6. Serve through the server of your choice
 
 ### Websocket Client Handling Loop
 
