@@ -2,11 +2,9 @@ from flask import Flask, request
 from flask_sockets import Sockets
 from pubsub.pubsubhub import PubSubHub
 
-# Declaring http app and sockets app
+# Declaring HTTP, WebSocket and PubSub app
 http = Flask(__name__)
 ws = Sockets(http)
-
-
 pubsub = PubSubHub(http, ws)
 
 if __name__ == "__main__":
