@@ -52,6 +52,9 @@ if __name__ == "__main__":
 add_topic(topic)
 > Allows to add a topic to the PubSub Hub. Topic is a class that is described below, which
 
+serve(client):
+> Client Handling loop (described above)
+
 ### Class: Client
 > Client represent the websocket connection from the POV of the Hub, providing methods to serve and check connexion health.  
 > It wraps the client handling loop as `serve()`
@@ -59,13 +62,20 @@ add_topic(topic)
 > Checks ping requirements as well as subscription requirements      
 
 **Properties**: 
-is_alive: 
-> Checks if the last ping/pong was issued before the timeout threshold 
+alive: 
+> Checks for 3 connexion maintain routines : 
+> if the last ping/pong was issued before the timeout threshold 
+> if websocket was closed
+> if client was subscribed for 15 seconds
 
 
 **Methods**:
-serve():
-> Client Handling loop (described above)
 
-subscriber_since(amount)
+alive(amount)
 > Checks if the client was subscribed to anything within the `amount` last seconds
+
+getaddr()
+> Return formatted remote address with port, using one of those headers : 
+> X_REAL_IP (internal header name: HTTP_X_REAL_IP), set by your reverse proxy
+> REMOTE_ADDR if HTTP_X_REAL_IP doesn't exist
+> REMOTE_PORT 
