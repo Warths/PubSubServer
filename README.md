@@ -6,8 +6,8 @@ This will create an "echo" topic, which doesn't require any authentification to 
 ```py
 from flask import Flask
 from flask_sockets import Sockets  
-from pubsub import PubSubHub 
-from pubsub.topic import EchoTopic
+from pubsubhub import PubSubHub 
+from pubsubhub.topic import EchoTopic
   
 # Declaring http app, sockets app and PubSub app
 http = Flask(__name__)  
