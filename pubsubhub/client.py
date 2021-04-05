@@ -1,5 +1,6 @@
 from gevent import Timeout
 from .getlogger import getLogger
+import json
 import time
 
 
@@ -25,11 +26,34 @@ class PubSubClient:
 
     def receive(self, timeout=0.1):
         """
-        Try receiving data from client
+        Try receiving data from client. Ignore garbage data.
         :param timeout: Amount of time before giving up
         """
         with Timeout(timeout, False):
-            return self.websocket.receive()
+            try:
+                return json.loads(self.websocket.receive())
+            except json.JSONDecodeError:
+                pass
+
+    def send(self, payload):
+        """ Send the payload to the client """
+        self.websocket.send(json.dumps(payload))
+
+    def send_all(self, flush=True):
+        """ sends all payloads to the client"""
+        for payload in self.queue:
+            self.send(payload)
+
+        if flush:
+            self.flush()
+
+    def flush(self):
+        """ Removes all payloads in the queue """
+        self.queue = []
+
+    def add_to_queue(self, payload):
+        """ Adds a payload to the queue """
+        self.queue.append(payload)
 
     @property
     def alive(self):
