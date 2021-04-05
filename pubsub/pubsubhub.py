@@ -1,5 +1,8 @@
 import json
 import time
+from .client import PubSubClient
+from .getlogger import getLogger
+
 
 class PubSubHub:
     def __init__(self, http, ws, http_route="/publish/<string:name>", ws_route="/", name="PubSub"):
@@ -11,10 +14,11 @@ class PubSubHub:
         :param ws_route: ws adress root
         """
         self.name = name
+        self.log = getLogger(name)
         self._http = http
         self._ws = ws
         self._populate(http_route, ws_route)
-        self.topics = []
+        self.topics_indexing = {}
 
     def _populate(self, http_route, ws_route):
         # Adding Http Publish route
@@ -25,8 +29,17 @@ class PubSubHub:
         # Declaring
         @self._ws.route(ws_route)
         def ws_route(client, *args, **kwargs):
-            print(client)
             client.send(json.dumps({"status": 200, "success": True}))
-            while not client.closed:
-                pass
+            self.serve(PubSubClient(client))
+
+
+    def serve(self, client):
+        """ Client handling """
+        client.log.info("Connection")
+        while client.alive:
+            client.receive()
+        client.log.info("Disconnected")
+
+
+
 
