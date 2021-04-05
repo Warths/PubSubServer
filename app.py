@@ -1,6 +1,6 @@
 from flask import Flask, request
 from flask_sockets import Sockets
-from pubsub.pubsubhub import PubSubHub
+from pubsubhub.pubsubhub import PubSubHub
 
 # Declaring HTTP, WebSocket and PubSub app
 http = Flask(__name__)

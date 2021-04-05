@@ -37,6 +37,9 @@ class PubSubHub:
         """ Client handling """
         client.log.info("Connection")
         while client.alive:
+            if not client.respect_guidelines:
+                client.close()
+
             client.receive()
         client.log.info("Disconnected")
 
