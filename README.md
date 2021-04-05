@@ -79,3 +79,15 @@ getaddr()
 > X_REAL_IP (internal header name: HTTP_X_REAL_IP), set by your reverse proxy
 > REMOTE_ADDR if HTTP_X_REAL_IP doesn't exist
 > REMOTE_PORT 
+
+send(payload)
+> Sends a payload to client. Take care of json encoding
+
+send_all(flush=True)
+> Sends every payload in the queue. Empty the queue if flush is set to true (default)
+
+flush()
+> Removes all messages in the queue
+
+add_to_queue()
+> Adds a payload to the queue

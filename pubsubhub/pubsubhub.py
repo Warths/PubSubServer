@@ -26,7 +26,7 @@ class PubSubHub:
         def http_handling(*args, **kwargs):
             return "Success", 200
 
-        # Declaring
+        # Adding WebSocket Subscribe route
         @self._ws.route(ws_route)
         def ws_route(client, *args, **kwargs):
             client.send(json.dumps({"status": 200, "success": True}))
@@ -39,6 +39,9 @@ class PubSubHub:
         while client.alive:
             if not client.respect_guidelines:
                 client.close()
+
+            client.send_all()
+            client.flush()
 
             client.receive()
         client.log.info("Disconnected")
