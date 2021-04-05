@@ -1,21 +1,27 @@
 from gevent import Timeout
+from .getlogger import getLogger
 import time
 
 
-class Client:
-    timeout = 300
-
-    def __init__(self, websocket):
+class PubSubClient:
+    def __init__(self, websocket, ping_timeout=300, unsubscribed_timeout=15):
         """
         PubSubHub Client class
         :param websocket: websocket
         """
         self.websocket = websocket
         self.queue = []
+        self.topics = []
 
         # Service timeout related
         self.last_ping = time.time()
-        self.last_service = time.time()
+        self.last_subscriber_date = time.time()
+
+        self.ping_timeout = ping_timeout
+        self.unsubscribed_timeout = unsubscribed_timeout
+
+        self.log = getLogger("{}:{}".format(*self.getaddr()))
+
 
     def receive(self, timeout=0.1):
         """
@@ -25,4 +31,36 @@ class Client:
         with Timeout(timeout, False):
             return self.websocket.receive()
 
+    @property
+    def alive(self):
+        if self.websocket.closed:
+            self.log.debug("Connexion closed gracefully")
+            return False
 
+        if self.no_subscription_check(self.unsubscribed_timeout):
+            self.log.debug("Client wasn't subscribed to any topic for {} seconds".format(self.unsubscribed_timeout))
+            return False
+
+        if self.no_ping_check(self.ping_timeout):
+            self.log.debug("Client didn't send ping for {}".format(self.ping_timeout))
+            return False
+
+        return True
+
+    def no_subscription_check(self, seconds):
+        if len(self.topics):
+            self.last_subscriber_date = time.time()
+        return self.last_subscriber_date + seconds < time.time()
+
+    def no_ping_check(self, seconds):
+        return self.last_ping + seconds < time.time()
+
+    def getaddr(self):
+        """ return address and port. Try to get real IP from Nginx """
+        try:
+            addr = self.websocket.environ["HTTP_X_REAL_IP"]
+        except KeyError:
+            addr = self.websocket.environ['REMOTE_ADDR']
+        port = self.websocket.environ['REMOTE_PORT']
+
+        return addr, port
