@@ -2,7 +2,7 @@ from gevent import Timeout
 from .getlogger import getLogger
 import json
 import time
-
+from .exceptions import SendException
 
 class PubSubClient:
     def __init__(self, websocket, ping_timeout=300, unsubscribed_timeout=15):
@@ -37,7 +37,11 @@ class PubSubClient:
 
     def send(self, payload):
         """ Send the payload to the client """
-        self.websocket.send(json.dumps(payload))
+        try:
+            self.websocket.send(json.dumps(payload))
+        except Exception as e:
+            self.log.debug("{}: {}".format(e.__name__, e))
+            raise SendException
 
     def send_all(self, flush=True):
         """ sends all payloads to the client"""
