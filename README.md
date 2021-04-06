@@ -45,7 +45,8 @@ if __name__ == "__main__":
 
 ## Objects 
 ### Class: PubSubHub
-> PubSubHub is a class that provide a closed Websocket/HTTP hub for client to connects, subscribe or publish. It takes the Flask and Flask-sockets Apps as arguments, and creates the ws and http endpoints automatically. 
+> PubSubHub is a class that provide a closed Websocket/HTTP hub for client to connects, subscribe or publish. It takes the Flask and Flask-sockets Apps as arguments, and creates the ws and http endpoints automatically.
+> 
 > Routes for both endpoints can be customized, to allow multiple PubSubHub to work on the same application.
 
 **Methods**: 
@@ -56,16 +57,22 @@ serve(client):
 > Client Handling loop (described above)
 
 ### Class: Client
-> Client represent the websocket connection from the POV of the Hub, providing methods to serve and check connexion health.  
+> Client represent the websocket connection from the POV of the Hub, providing methods to serve and check connexion health.
+>  
 > It wraps the client handling loop as `serve()`
+>
 > It allows for non-blocking receive
+>
 > Checks ping requirements as well as subscription requirements      
 
 **Properties**: 
 alive: 
 > Checks for 3 connexion maintain routines : 
+>
 > if the last ping/pong was issued before the timeout threshold 
+>
 > if websocket was closed
+>
 > if client was subscribed for 15 seconds
 
 
@@ -76,8 +83,11 @@ alive(amount)
 
 getaddr()
 > Return formatted remote address with port, using one of those headers : 
+>
 > X_REAL_IP (internal header name: HTTP_X_REAL_IP), set by your reverse proxy
+>
 > REMOTE_ADDR if HTTP_X_REAL_IP doesn't exist
+>
 > REMOTE_PORT 
 
 send(payload)
