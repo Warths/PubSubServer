@@ -2,6 +2,7 @@ import json
 import time
 from .client import PubSubClient
 from .getlogger import getLogger
+from .exceptions import *
 
 
 class PubSubHub:
@@ -21,6 +22,8 @@ class PubSubHub:
         self.topics_indexing = {}
 
     def _populate(self, http_route, ws_route):
+        """ Adds HTTP ans WS route to the HTTP ans WS apps """
+
         # Adding Http Publish route
         @self._http.route(http_route)
         def http_handling(*args, **kwargs):
@@ -40,8 +43,11 @@ class PubSubHub:
             if not client.respect_guidelines:
                 client.close()
 
-            client.send_all()
-            client.flush()
+            try:
+                client.send_all()
+                client.flush()
+            except PubSubClientException:
+                pass
 
             client.receive()
         client.log.info("Disconnected")
