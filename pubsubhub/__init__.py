@@ -1,3 +1,4 @@
 from .pubsubhub import PubSubHub
-from .client import PubSubClient
+from pubsubhub.client.client import Client
 from .getlogger import getLogger
+from .rules import *
