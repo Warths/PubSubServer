@@ -19,23 +19,54 @@ pubsub.rule_set.add_rules(
 )
 
 pubsub.topic_pool.add_topics(
-    Topic("presence", publishers=["twitch"], subscribers=["any"], appended=[
-        lambda: {"server_time": ServerTime()},
-        lambda: {"emitted": ServerTime().__repr__()}
-    ]),
-    Topic("secret", publishers=["app"], subscribers=["any"]),
-    Topic("asIrc", publishers=["twitch"], subscribers=["any"]),
-    Topic("LightFXCooldown",
-          publishers=["app"],
-          subscribers=["any"],
-          appended=[
-              lambda: {"server_time": ServerTime()},
-              lambda: {"emitted": ServerTime().__repr__()}
-          ],
-          spec={
-              "cooldown": int,
-          }
-          ),
+    Topic(
+        "light_fx_cooldown",
+        publishers=["app"],
+        subscribers=["any"],
+        appended=[
+            lambda: {"server_time": ServerTime()},
+            lambda: {"emitted": ServerTime().__repr__()}
+        ],
+        spec={
+            "cooldown": int,
+        }
+    ),
+    Topic(
+        "light_cooldown",
+        publishers=["app"],
+        subscribers=["any"],
+        appended=[
+            lambda: {"server_time": ServerTime()},
+            lambda: {"emitted": ServerTime().__repr__()}
+        ],
+        spec={
+            "cooldown": int,
+        }
+    ),
+    Topic(
+        "light_availability",
+        publishers=["app"],
+        subscribers=["any"],
+        spec={
+            "available": bool,
+        }
+    ),
+    Topic(
+        "light_fx_availability",
+        publishers=["app"],
+        subscribers=["any"],
+        spec={
+            "available": bool,
+        }
+    ),
+    Topic(
+        "playlist",
+        publishers=["app"],
+        subscribers=["any"],
+        spec={
+            "available": list,
+        }
+    ),
 )
 
 if __name__ == "__main__":
