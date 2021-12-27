@@ -82,8 +82,7 @@ class Topic:
         for func in self.appended:
             for k, v in func().items():
                 if self.spec is None:
-                    pass
-                    # self.spec = {}
+                    self.spec = {}
                 self.spec[k] = type(v)
                 self.appended_names.append(k)
 
@@ -93,6 +92,8 @@ class Topic:
 
     def verbose(self):
         print(f"TOPIC NAME : {self.name}")
+        print(f"  PUBLISHERS : {self.publishers}")
+        print(f"  SUBSCRIBERS : {self.subscribers}")
         if self.spec is None:
             print("    No spec.")
             return
@@ -100,5 +101,6 @@ class Topic:
         for field in self.spec:
             suffix = "(implicit)" if field in self.appended_names else "(required)"
             print(f"        {suffix} {field}: {self.spec[field].__name__}")
+
 
 
