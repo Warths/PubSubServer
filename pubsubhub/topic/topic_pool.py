@@ -8,6 +8,7 @@ class TopicPool:
         """
         for topic in args:
             self.topics.append(topic)
+            topic.verbose()
 
     def get_topic(self, name):
         """

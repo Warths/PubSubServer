@@ -1,4 +1,3 @@
-import json
 import traceback
 from .client import Client, ClientPool
 from .topic import TopicPool
@@ -110,12 +109,12 @@ class PubSubHub:
                     errors.append("Can not subscribe to <{}> with provided auth method/credentials.".format(topic.name))
             else:
                 errors.append("Topic <{}> doesn't exist".format(topic_name))
-
-        client.send({
+        payload = {
             "success": success,
             "errors": errors,
             "nonce": nonce
-        })
+        }
+        client.send(payload)
 
     def handle_unsubscribe(self, client, message):
         errors = []
@@ -168,26 +167,30 @@ class PubSubHub:
         topic = self.topic_pool.get_topic(message["topic"])
         if topic.can_publish(message):
             payload = topic.get_payload(message)
+            topic.validate_payload(payload)
             filters = topic.get_filters(payload)
 
-            for client in self.client_pool.clients:
-                if client.is_subscribed(payload["topic"], filters):
+            for other_client in self.client_pool.clients:
+                if other_client.is_subscribed(payload["topic"], filters):
                     topic.last_publish = {
                         "payload": payload,
                         "filters": filters
                     }
-                    client.send(payload)
+                    other_client.send(payload)
 
             success.append("Content published to topic '{}' with filters {}".format(message["topic"], filters))
 
         else:
             errors.append("Can not publish to '{}' with provided auth method/credentials.".format(message["topic"]))
 
-        client.send({
+        payload = {
             "success": success,
             "errors": errors,
             "nonce": nonce
-        })
+        }
+
+        client.send(payload)
+
 
 
 
@@ -215,12 +218,3 @@ class PubSubHub:
             if not client.alive:
                 self.client_pool.clients.remove(client)
                 break
-
-
-
-
-
-
-
-
-

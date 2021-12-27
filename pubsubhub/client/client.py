@@ -1,9 +1,12 @@
-import geventwebsocket.exceptions
-from gevent import Timeout
-from pubsubhub.getlogger import getLogger
-from threading import Lock
 import json
 import time
+from threading import Lock
+import geventwebsocket.exceptions
+from gevent import Timeout
+
+from pubsubhub.getlogger import getLogger
+
+
 class Client:
     def __init__(self, websocket):
         """
@@ -24,7 +27,7 @@ class Client:
 
     def is_subscribed(self, name, filters):
         """
-
+        Return if a user is subscribed to a topic (with modifiers)
         """
         for topic in self.topics:
             topic_filters = topic.split(".")
@@ -40,10 +43,6 @@ class Client:
 
         return False
 
-
-
-
-
     def receive(self, timeout=0.1):
         """
         Try receiving data from client. Ignore garbage data.
@@ -51,13 +50,14 @@ class Client:
         """
         with Timeout(timeout, False):
             try:
-                message = json.loads(self.websocket.receive())
-                print(message)
+                pre = self.websocket.receive()
+                message = json.loads(pre)
                 return message
             except (TypeError, geventwebsocket.exceptions.WebSocketError):
                 # Client probably closed and returned none
                 self.close()
             except json.JSONDecodeError:
+                self.log.info(pre)
                 self.log.info("Couldn't be processed as a JSON string. Skipping")
 
     def fetch(self):
@@ -76,9 +76,9 @@ class Client:
     def send(self, payload):
         """ Send the payload to the client """
         try:
-            self.websocket.send(json.dumps(payload))
+            self.websocket.send(json.dumps(payload, default=lambda o: o.__repr__()) + "\r\n")
         except Exception as e:
-            self.log.debug("{}: {}".format(str(e), e))
+            self.log.warning("{}: {}".format(str(e), e))
 
     def send_all(self, flush=True):
         """ sends all payloads to the client"""
@@ -88,9 +88,17 @@ class Client:
         if flush:
             self.flush()
 
+    def send_one(self):
+        if self.queue:
+            with Lock():
+                payload = self.queue.pop()
+                self.send(payload)
+                self.log.debug(payload)
+
     def flush(self):
         """ Removes all payloads in the queue """
-        self.queue = []
+        with Lock():
+            self.queue = []
 
     def add_to_queue(self, payload):
         """ Adds a payload to the queue """
@@ -121,5 +129,3 @@ class Client:
         port = self.websocket.environ['REMOTE_PORT']
 
         return addr, port
-
-

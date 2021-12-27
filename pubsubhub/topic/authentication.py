@@ -58,12 +58,14 @@ def is_authorized(permitted_status, auth_data):
 
     # TO REWORK
     # APP SUBSCRIPTIONS
-    if auth_data["token"] in credentials.SECRETS and "app" in permitted_status:
-        return ["app:{}".format(credentials.SECRETS[auth_data["token"]])]
+    if "app" in permitted_status:
+        if auth_data["token"] in credentials.SECRETS:
+            return ["app:{}".format(credentials.SECRETS[auth_data["token"]])]
 
     # OAUTH2 SUBSCRIPTION (Twitch)
-    if auth_data["type"] == "twitch" and twitch_auth.verify(auth_data['token']):
-        return list(twitch_auth.get_identity(auth_data['token']).values())
+    if "twitch" in permitted_status:
+        if auth_data["type"] == "twitch" and twitch_auth.verify(auth_data['token']):
+            return list(twitch_auth.get_identity(auth_data['token']).values())
 
     # If we reach this, auth data is not a known/supported type
     return False
