@@ -165,6 +165,10 @@ class PubSubHub:
         """ Checking End """
 
         topic = self.topic_pool.get_topic(message["topic"])
+
+        if topic is None:
+            raise AttributeError("Topic <{}> doesn't exist".format(message["topic"]))
+
         if topic.can_publish(message):
             payload = topic.get_payload(message)
             topic.validate_payload(payload)
