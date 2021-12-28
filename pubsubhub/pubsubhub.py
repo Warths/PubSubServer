@@ -1,4 +1,6 @@
 import traceback
+import json
+from flask import request
 from .client import Client, ClientPool
 from .topic import TopicPool
 from .getlogger import getLogger
@@ -8,7 +10,7 @@ from threading import Thread
 import time
 
 class PubSubHub:
-    def __init__(self, http, ws, http_route="/publish/", ws_route="/", name="PubSub"):
+    def __init__(self, http, ws, http_route="/publish/<topic>/", ws_route="/", name="PubSub"):
         """
         :param http: Flask Http server
         :param ws: Flask-Sockets WS server
@@ -37,9 +39,36 @@ class PubSubHub:
         """ Adds HTTP ans WS route to the HTTP ans WS apps """
 
         # Adding Http Publish only route
-        @self._http.route(http_route)
+        @self._http.route(http_route, methods=["POST"])
         def http_handling(*args, **kwargs):
-            return "Success", 200
+            try:
+                body = json.loads(request.data.decode())
+            except json.decoder.JSONDecodeError:
+                return {"error": "Bad request"}, 400
+
+            authorization = {
+                "token": request.headers.get("token"),
+                "type": request.headers.get("type")
+            }
+
+            message = {
+                "type": "PUBLISH",
+                "message": body,
+                "topic": kwargs["topic"],
+                "nonce": request.headers.get("nonce"),
+            }
+
+            if authorization["token"]:
+                message["authorization"] = authorization
+
+            try:
+                response = self.handle_publish(None, message)
+                return response, 200
+            except AttributeError as e:
+                return {"error": str(e)}, 400
+            except PermissionError as e:
+                return {"error": str(e)}, 401
+
 
         # Adding WebSocket PubSub route
         @self._ws.route(ws_route)
@@ -185,15 +214,19 @@ class PubSubHub:
             success.append("Content published to topic '{}' with filters {}".format(message["topic"], filters))
 
         else:
-            errors.append("Can not publish to '{}' with provided auth method/credentials.".format(message["topic"]))
+            errors.append("Can not publish to '{}' with provided authentication method and/or credentials.".format(message["topic"]))
+            if not client:
+                raise PermissionError("Invalid authentication")
 
         payload = {
             "success": success,
             "errors": errors,
             "nonce": nonce
         }
-
-        client.send(payload)
+        if client:
+            client.send(payload)
+        else:
+            return payload
 
 
 
