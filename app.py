@@ -64,9 +64,18 @@ pubsub.topic_pool.add_topics(
         publishers=["app"],
         subscribers=["any"],
         spec={
-            "available": list,
+            "data": list,
         }
     ),
+    Topic(
+        "playlist_state",
+        publishers=["app"],
+        subscribers=["any"],
+        spec={
+            "Standard": bool,
+            "VIP": bool
+        }
+    )
 )
 
 if __name__ == "__main__":
