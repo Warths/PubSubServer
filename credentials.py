@@ -1,6 +1,6 @@
-SECRETS = {"MSS2rp79484KXoyj0Gpm0shEDPMGo2hL": "Shreaddy"}
+SECRETS = {"YourSuperSecretHere": "YourAppNameHere"}
 
-TWITCH_CLIENT_ID = "kh3yohkrwpbo6m71sryrw8hm0gls90"
+TWITCH_CLIENT_ID = "YourTwitchClientIdHere(forApiUsagePurpose)"
 TWITCH_SECRET = ""
 
 

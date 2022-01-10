@@ -75,6 +75,18 @@ pubsub.topic_pool.add_topics(
             "Standard": bool,
             "VIP": bool
         }
+    ),
+    Topic(
+        "moderators",
+        publishers=["app"],
+        subscribers=["any"],
+        spec={"data": list}
+    ),
+    Topic(
+        "irc",
+        publishers=["twitch"],
+        subscribers=["any"],
+        spec={"message": str}
     )
 )
 
