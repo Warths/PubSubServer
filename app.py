@@ -86,7 +86,8 @@ pubsub.topic_pool.add_topics(
         "irc",
         publishers=["twitch"],
         subscribers=["any"],
-        spec={"message": str}
+        spec={"message": str},
+        persistent=False
     )
 )
 
